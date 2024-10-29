@@ -1,9 +1,8 @@
 <?php
 /**
  * @author Amin Mahmoudi (MasterkinG)
- * @copyright    Copyright (c) 2019 - 2020, MasterkinG32. (https://masterking32.com)
+ * @copyright    Copyright (c) 2019 - 2024, MasterkinG32. (https://masterking32.com)
  * @link    https://masterking32.com
- * @Description : It's not masterking32 framework !
  **/
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -14,7 +13,10 @@ $success_msg = "";
 
 function getIP()
 {
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        // IP passed from Cloudflare
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         //ip from share internet
         $ip = $_SERVER['HTTP_CLIENT_IP'];
     } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -32,6 +34,17 @@ function get_config($name)
     if (!empty($name)) {
         if (isset($config[$name])) {
             return $config[$name];
+        }
+    }
+    return false;
+}
+
+function get_core_config($name)
+{
+    global $core_config;
+    if (!empty($name)) {
+        if (isset($core_config[$name])) {
+            return $core_config[$name];
         }
     }
     return false;
@@ -141,6 +154,7 @@ function send_phpmailer($email, $subject, $message)
         $mail->addReplyTo(get_config('smtp_mail'));
 
         // Content
+	$mail->CharSet = 'UTF-8';
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $message;
@@ -168,8 +182,6 @@ function generateRandomString($length = 10)
 
 function RemoteCommandWithSOAP($COMMAND)
 {
-    global $soap_connection_info;
-
     if (empty($COMMAND)) {
         return false;
     }
@@ -190,8 +202,12 @@ function RemoteCommandWithSOAP($COMMAND)
     }
 }
 
-function validate_hcaptcha($value)
+function validate_hcaptcha()
 {
+    if (empty($_POST['h-captcha-response'])) {
+        return false;
+    }
+
     try {
         $data = array(
             'secret' => get_config('captcha_secret'),
@@ -213,8 +229,12 @@ function validate_hcaptcha($value)
     return false;
 }
 
-function validate_recaptcha($value)
+function validate_recaptcha()
 {
+    if (empty($_POST['g-recaptcha-response'])) {
+        return false;
+    }
+
     try {
         $verify = curl_init();
         curl_setopt($verify, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify?secret=" . get_config('captcha_secret') . "&response=" . $_POST['g-recaptcha-response']);
@@ -241,12 +261,12 @@ function captcha_validation()
     } else if (!empty(get_config('captcha_type')) && get_config('captcha_type') > 2) {
         return true;
     } elseif (!empty(get_config('captcha_type')) && get_config('captcha_type') == 1 && !empty($_POST['h-captcha-response'])) {
-        if (!validate_hcaptcha($_POST['h-captcha-response'])) {
+        if (!validate_hcaptcha()) {
             error_msg(lang('hcaptcha_not_valid'));
             return false;
         }
     } elseif (!empty(get_config('captcha_type')) && get_config('captcha_type') == 2 && !empty($_POST['g-recaptcha-response'])) {
-        if (!validate_recaptcha($_POST['g-recaptcha-response'])) {
+        if (!validate_recaptcha()) {
             error_msg(lang('recaptcha_not_valid'));
             return false;
         }
@@ -291,7 +311,7 @@ function GetCaptchaHTML($bootstrap = true)
     return '<div class="input-group"><span class="input-group">' . lang('captcha') . '</span><input type="text" class="form-control" placeholder="' . lang('captcha') . '" name="captcha"></div><p style="text-align: center;margin-top: 10px;"><img src="' . user::$captcha->inline() . '" style="border - radius: 5px;"/></p>';
 }
 
-// Its from Trinitycore/account-creator
+// Its from TrinityCore/account-creator
 function calculateSRP6Verifier($username, $password, $salt)
 {
     // algorithm constants
@@ -302,7 +322,12 @@ function calculateSRP6Verifier($username, $password, $salt)
     $h1 = sha1(strtoupper($username . ':' . $password), TRUE);
 
     // calculate second hash
-    $h2 = sha1($salt . $h1, TRUE);
+	if(get_config('server_core') == 5)
+	{
+		$h2 = sha1(strrev($salt) . $h1, TRUE);  // From haukw
+	} else {
+		$h2 = sha1($salt . $h1, TRUE);
+	}
 
     // convert to integer (little-endian)
     $h2 = gmp_import($h2, 1, GMP_LSW_FIRST);
@@ -317,7 +342,12 @@ function calculateSRP6Verifier($username, $password, $salt)
     $verifier = str_pad($verifier, 32, chr(0), STR_PAD_RIGHT);
 
     // done!
-    return $verifier;
+	if(get_config('server_core') == 5)
+	{
+		return strrev($verifier);  // From haukw
+	} else {
+		return $verifier;
+	}
 }
 
 // Returns SRP6 parameters to register this username/password combination with
@@ -330,6 +360,12 @@ function getRegistrationData($username, $password)
     $verifier = calculateSRP6Verifier($username, $password, $salt);
 
     // done - this is what you put in the account table!
+	if(get_config('server_core') == 5)
+	{
+		$salt = strtoupper(bin2hex($salt));         	// From haukw
+		$verifier = strtoupper(bin2hex($verifier));     // From haukw
+	}
+	
     return array($salt, $verifier);
 }
 

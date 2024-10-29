@@ -1,9 +1,8 @@
 <?php
 /**
  * @author Amin Mahmoudi (MasterkinG)
- * @copyright    Copyright (c) 2019 - 2020, MasterkinG32. (https://masterking32.com)
+ * @copyright    Copyright (c) 2019 - 2024, MasterkinG32. (https://masterking32.com)
  * @link    https://masterking32.com
- * @Description : It's not masterking32 framework !
  **/
 
 $language['lang'] = 'chinese';
@@ -13,6 +12,11 @@ $language['tpl_advance_custom_css'] = '';
 $language['tpl_icecrown_custom_css'] = '';
 $language['tpl_kaelthas_custom_css'] = '';
 $language['tpl_battleforazeroth_custom_css'] = '';
+
+// Lang changer
+$language['change_lang_head'] = 'Language Changer';
+$language['change_lang_form_head'] = 'Select Language';
+$language['change_lang_sub'] = 'Change';
 
 $language['welcome_to'] = '欢迎来到';
 $language['welcome_message'] = '欢迎来到我们的服务器，赶快加入我们吧！';
@@ -39,7 +43,7 @@ $language['realmlist'] = '服务器列表';
 $language['create_account'] = '创建账户';
 $language['create_account_tip1'] = '首先，您必须创建一个帐户。该帐号用于登录游戏和我们的网站。点击这里打开注册页面';
 $language['download_game'] = '下载游戏';
-$language['create_account_tip2'] = '安装魔兽世界。你可以从这里(合法的)下载:Windows或Mac。确保升级到我们当前支持的游戏版本，当前版本为'.get_config ('game_version').'。镜像源可以在这里找到。';
+$language['create_account_tip2'] = '安装魔兽世界。你可以从这里(合法的)下载:Windows或Mac。确保升级到我们当前支持的游戏版本，当前版本为'.get_config ('game_version').'。镜像源可以在这里找到';
 $language['setup_game'] = '安装游戏';
 $language['create_account_tip3'] = '打开"魔兽世界"目录。默认目录是"C:\Program Files\World of Warcraft"。进入目录后，打开名为"data"的目录，然后进入名为zhCN或enGB或enUS的目录（取决于你的客户端语言）。';
 $language['change_server_address'] = '修改服务器地址';
@@ -69,16 +73,17 @@ $language['online_players_msg2'] = '当前无在线玩家';
 $language['name'] = '角色';
 $language['race'] = '种族';
 $language['class'] = '职业';
-$language['level'] = '级别';
+$language['level'] = '等级';
 $language['top_players'] = '英雄榜';
 $language['play_time'] = '游戏时间';
+$language['gold'] = '金币';
 $language['killers'] = '击杀榜';
 $language['kills'] = '击杀';
 $language['honor_points'] = '荣誉点数';
 $language['honor_level'] = '荣誉级别';
 $language['arena_points'] = '竞技场点数';
 $language['arena_teams'] = '竞技场团队';
-$language['rank'] = '级别';
+$language['rank'] = '排行';
 $language['rating'] = '评级';
 $language['captain_name'] = '队长名字';
 $language['frequently_questions'] = '常见问题';
@@ -110,7 +115,7 @@ $language['check_your_email'] = '请至注册邮箱查收邮件，注意有可�
 $language['account_is_not_valid'] = '账户不存在。';
 $language['vote_site_not_valid'] = '投票站点不存在。';
 $language['you_already_voted'] = '你已经在该站点投过票了。';
-$language['captcha_not_valid'] = '验证码不存在';
-$language['hcaptcha_not_valid'] = '验证码不存在。';
-$language['recaptcha_not_valid'] = '验证码不存在。';
-$language['captcha_required'] = '需求验证码。';
+$language['captcha_not_valid'] = '验证码错误。';
+$language['hcaptcha_not_valid'] = '验证码错误。';
+$language['recaptcha_not_valid'] = '验证码错误。';
+$language['captcha_required'] = '需要验证码。';
